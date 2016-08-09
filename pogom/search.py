@@ -192,10 +192,11 @@ def search_worker_thread(args, account, search_items_queue, parse_lock, encrypti
             # Create the API instance this will use
             api = PGoApi()
 
+            # Get current time
+            loop_start_time = int(round(time.time() * 1000))
+
             # The forever loop for the searches
             while True:
-                # Get current time
-                loop_start_time = int(round(time.time() * 1000))
 
                 # Grab the next thing to search (when available)
                 step, step_location = search_items_queue.get()
@@ -255,6 +256,8 @@ def search_worker_thread(args, account, search_items_queue, parse_lock, encrypti
                 sleep_delay_remaining = loop_start_time + (args.scan_delay * 1000) - int(round(time.time() * 1000))
                 if sleep_delay_remaining > 0:
                     time.sleep(sleep_delay_remaining / 1000)
+
+                loop_start_time += args.scan_delay * 1000
 
         # catch any process exceptions, log them, and continue the thread
         except Exception as e:
