@@ -194,6 +194,8 @@ def search_worker_thread(args, account, search_items_queue, parse_lock, encrypti
 
             # The forever loop for the searches
             while True:
+                # Get current time
+                loop_start_time = int(round(time.time() * 1000))
 
                 # Grab the next thing to search (when available)
                 step, step_location = search_items_queue.get()
@@ -248,7 +250,11 @@ def search_worker_thread(args, account, search_items_queue, parse_lock, encrypti
                             failed_total += 1
                             time.sleep(sleep_time)
 
-                time.sleep(args.scan_delay)
+                # If there's any time left between the start time and the time when we should be kicking off the next
+                # loop, hang out until its up.
+                sleep_delay_remaining = loop_start_time + (args.scan_delay * 1000) - int(round(time.time() * 1000))
+                if sleep_delay_remaining > 0:
+                    time.sleep(sleep_delay_remaining / 1000)
 
         # catch any process exceptions, log them, and continue the thread
         except Exception as e:
