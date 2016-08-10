@@ -5,7 +5,7 @@ import logging
 import calendar
 from peewee import SqliteDatabase, InsertQuery, \
     IntegerField, CharField, DoubleField, BooleanField, \
-    DateTimeField, fn
+    DateTimeField, PrimaryKeyField, fn
 from playhouse.flask_utils import FlaskDB
 from playhouse.pool import PooledMySQLDatabase
 from playhouse.shortcuts import RetryOperationalError
@@ -263,7 +263,7 @@ class Gym(BaseModel):
 
 
 class ScannedLocation(BaseModel):
-    scanned_id = CharField(primary_key=True, max_length=50)
+    scanned_id = PrimaryKeyField()
     latitude = DoubleField()
     longitude = DoubleField()
     last_modified = DateTimeField(index=True)
@@ -377,7 +377,6 @@ def parse_map(map_dict, step_location):
     gyms_upserted = 0
 
     scanned[0] = {
-        'scanned_id': str(step_location[0]) + ',' + str(step_location[1]),
         'latitude': step_location[0],
         'longitude': step_location[1],
         'last_modified': datetime.utcnow(),
